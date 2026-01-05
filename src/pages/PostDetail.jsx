@@ -1,40 +1,68 @@
-import React, { useState } from 'react'
-import DOMPurify from 'dompurify'
+import { useState, useEffect } from "react";
+import { useParams } from "react-router";
+import Swal from "sweetalert2";
+import PostService from "../services/post.service";
+import { useContext } from "react";
+import { UserContext } from "../context/UserContext";
 
 const PostDetail = () => {
+  const { id } = useParams();
+  const { userInfo } = useContext(UserContext);
+
   const [post, setPost] = useState({
-    id: "1",
-    title:
-      "ช่องบูมเมอแรง ได้ไปต่อ! MVTV Thailand ทุ่ม 200 ล้าน ให้เด็กไทยชมฟรีต่อเนื่อง",
-    cover:
-      "https://s.isanook.com/mv/0/ud/30/152539/boomerang.jpg?ip/crop/w1200h700/q80/webp",
-    author: "sanook",
-    createdAt: "2023-10-31",
-    summary:
-      "บริษัท เอ็มวีทีวี ไทยแลนด์ ทุ่มงบ 200 ล้าน ซื้อลิขสิทธิ์ช่องการ์ตูนดัง บูมเมอแรง (ฺBoomerang) เป็นของขวัญให้เด็กไทย ได้รับชมฟรีต่อเนื่อง หลังจากที่มีข่าวว่าช่อง บูมเมอแรง จะยุติการออกอากาศในวันที่ 1 กันยายน 2566 นี้ ในวันนี้ (31 ส.ค.) เฟซบุ๊กเพจ Boomerang Thailand แจ้งข่าวดีว่า บริษัท เอ็มวีทีวี ไทยแลนด์ ทุ่มงบ 200 ล้าน ซื้อลิขสิทธิ์ช่องการ์ตูนดัง บูมเมอแรง (ฺBoomerang) ให้เด็กไทยได้ชมกันอย่างต่อเนื่องฟรีๆ ต่อไปเรียบร้อยแล้ว",
+    _id: "",
+    title: "",
+    createdAt: "",
+    author: {},
+    content: "",
   });
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const response = await PostService.getById(id);
+        console.log(response);
+
+        if (response.status === 200) {
+          setPost(response.data);
+        }
+      } catch (error) {
+        Swal.fire({
+          title: "Post Detail",
+          icon: "error",
+          text: error?.response?.data?.message || error.message,
+        });
+      }
+    };
+    fetchPost();
+  }, [id]);
   return (
-    <div>
-      <div
-        className="card card-side bg-base-100 shadow-sm overflow-hidden rounded-md max-md:grid max-md:grid-cols-1"
-        key={post.id}
-      >
-        <div className="min-w-[400px] h-full object-cover">
-          <img
-            src={post.cover}
-            alt="Movie"
-            className="w-full h-full object-cover"
-          />
+    <div className="post-page min-h-full min-w-full items-center justify-center p-4 pt-20">
+      <div className="bg-white p-8 rounded-b-lg shadow-lg max-4xl w-full">
+        <h1 className="text-3xl font-bold mb-4 text-grey-800">{post?.title}</h1>
+        <div className="text-grey-600 mb-4 text-center">
+          <time className="block mb-2">{post?.createdAt}</time>
+          <div className="author mb-2">
+            By{" "}
+            <span className="text-blue-500">
+              @
+              <a href={`/author/${post?.author?._id}`}>
+                {post?.author?.username}
+              </a>
+            </span>
+          </div>
+          {userInfo?.id === post?.author?._id && (
+            <div className="edit-row mb-4 text-center flex items-center justify-center gap-2">
+              <a className="btn btn-warning" href={`/edit/${post?._id}`}>
+                Edit
+              </a>
+              <a className="btn btn-error">Delete</a>
+            </div>
+          )}
         </div>
-        <div className="card-body">
-          <h2 className="card-title">{post.title}</h2>
-          <p>By {post.author}</p>
-          <p> {post.createdAt}</p>
-          <div className="card-actions justify-end"></div>
-          <div className="content text-grey-700" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }}></div>
-        </div>
+        <div className="content text-grey-700">{post?.content}</div>
       </div>
     </div>
   );
 };
-export default PostDetail
+
+export default PostDetail;

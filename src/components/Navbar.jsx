@@ -1,6 +1,8 @@
 import React from "react";
+import { useNavigate } from "react-router";
 
 const Navbar = () => {
+  const navigate = useNavigate();
   const menuItems = [
     {
       name: "Home",
@@ -58,8 +60,12 @@ const Navbar = () => {
           </ul>
         </div>
         <div className="navbar-end">
-          <a className="btn">Login</a>
-          <a className="btn">Resgister</a>
+          <button onClick={() => navigate("/login")} className="btn">
+            Login
+          </button>
+          <button onClick={() => navigate("/register")} className="btn">
+            Register
+          </button>
         </div>
       </div>
     </>
