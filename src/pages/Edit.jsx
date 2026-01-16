@@ -1,8 +1,9 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useContext } from "react";
 import Editor from "../components/Editor";
 import PostService from "../services/post.service";
 import Swal from "sweetalert2";
 import { useNavigate, useParams } from "react-router";
+import { UserContext } from "../context/UserContext";
 
 const Edit = () => {
   const [postDetail, setPostDetail] = useState({
@@ -13,21 +14,35 @@ const Edit = () => {
   });
   
   const [loading, setLoading] = useState(true);
+  const [isAuthor, setIsAuthor] = useState(false);
   const editorRef = useRef(null);
   const navigate = useNavigate();
   const { id } = useParams();
+  const { userInfo } = useContext(UserContext);
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
         const response = await PostService.getById(id);
         if (response.status === 200) {
-          setPostDetail({
-            title: response.data.title,
-            summary: response.data.summary,
-            content: response.data.content,
-            file: null,
-          });
+          // ตรวจสอบว่าคนล็อกอินเป็นผู้เขียนโพสต์หรือไม่
+          if (response.data.author._id === userInfo?.id) {
+            setIsAuthor(true);
+            setPostDetail({
+              title: response.data.title,
+              summary: response.data.summary,
+              content: response.data.content,
+              file: null,
+            });
+          } else {
+            Swal.fire({
+              title: "Access Denied",
+              text: "You can only edit your own posts",
+              icon: "error",
+            }).then(() => {
+              navigate("/");
+            });
+          }
         }
       } catch (error) {
         Swal.fire({
@@ -43,7 +58,7 @@ const Edit = () => {
     };
 
     fetchPost();
-  }, [id, navigate]);
+  }, [id, navigate, userInfo]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

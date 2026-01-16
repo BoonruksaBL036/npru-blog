@@ -28,15 +28,32 @@ const Register = () => {
         icon: "error",
       });
     } else {
-      const response = await AuthService.register(user.username, user.password);
-      // console.log(response);
-      if (response?.status === 201) {
+      try {
+        const response = await AuthService.register(user.username, user.password);
+        console.log("Register Response:", response);
+        
+        // ตรวจสอบ status 201 หรือ 200 หรือข้อความสำเร็จ
+        if (response?.status === 201 || response?.status === 200 || response?.data?.message?.includes("successfully")) {
+          Swal.fire({
+            title: "Success",
+            text: response?.data?.message || "Registration successful",
+            icon: "success",
+          }).then(() => {
+            navigate("/login");
+          });
+        } else {
+          Swal.fire({
+            title: "Error",
+            text: response?.data?.message || "Registration failed",
+            icon: "error",
+          });
+        }
+      } catch (error) {
+        console.error("Register Error:", error);
         Swal.fire({
-          title: "Success",
-          text: response?.data?.message,
-          icon: "success",
-        }).then(() => {
-          navigate("/login");
+          title: "Error",
+          text: error?.response?.data?.message || error?.message || "Registration failed",
+          icon: "error",
         });
       }
     }
