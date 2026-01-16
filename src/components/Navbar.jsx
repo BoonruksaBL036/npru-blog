@@ -1,8 +1,12 @@
-import React from "react";
+import { useContext } from "react";
 import { useNavigate } from "react-router";
+import { UserContext } from '../context/UserContext'
+import Swal from "sweetalert2";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const { userInfo, logOut } = useContext(UserContext);
+  const username = userInfo?.username;
   const menuItems = [
     {
       name: "Home",
@@ -13,6 +17,21 @@ const Navbar = () => {
       url: "/create",
     },
   ];
+    const logout = () => {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You will be logged out of your session.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, logout!",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          logOut();
+        }
+      });
+    };
   return (
     <>
       <div className="navbar bg-base-100 shadow-sm">
@@ -60,12 +79,22 @@ const Navbar = () => {
           </ul>
         </div>
         <div className="navbar-end">
-          <button onClick={() => navigate("/login")} className="btn">
-            Login
-          </button>
-          <button onClick={() => navigate("/register")} className="btn">
-            Register
-          </button>
+          {username ? (
+            <>
+              <button onClick={logout} className="btn">
+                Log Out
+              </button>
+            </>
+          ) : (
+            <>
+              <button onClick={() => navigate("/login")} className="btn">
+                Login
+              </button>
+              <button onClick={() => navigate("/register")} className="btn">
+                Register
+              </button>
+            </>
+          )}
         </div>
       </div>
     </>

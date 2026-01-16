@@ -48,9 +48,9 @@ const Login = () => {
     }
   };
   return (
-    // <form onSubmit={handleSubmit}>
-    <div className="card bg-base-100 w-96 shadow-sm">
-      <div className="card-body space-y-2">
+    <div className="flex items-center justify-center ">
+      <div className="card bg-base-100 w-96 shadow-sm">
+        <div className="card-body space-y-2">
         <h2 className="card-title">Login</h2>
         <label className="input input-bordered flex items-center gap-2">
           Username
@@ -79,7 +79,7 @@ const Login = () => {
         </button>
       </div>
     </div>
-    // </form>
+    </div>
   );
 };
 

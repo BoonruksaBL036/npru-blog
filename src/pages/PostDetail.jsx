@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import PostService from "../services/post.service";
 import { useContext } from "react";
 import { UserContext } from "../context/UserContext";
+import DOMPurify from "dompurify";
 
 const PostDetail = () => {
   const { id } = useParams();
@@ -59,7 +60,11 @@ const PostDetail = () => {
             </div>
           )}
         </div>
-        <div className="content text-grey-700">{post?.content}</div>
+        <div className="content text-grey-700"
+        dangerouslySetInnerHTML={{
+          __html: DOMPurify.sanitize(post.content)
+        }}
+        ></div>
       </div>
     </div>
   );

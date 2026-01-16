@@ -1,48 +1,50 @@
-import React ,{ useRef, useState } from 'react'
-import Editor from '../components/Editor';
-import PostService from '../services/post.service';
-import Swal from 'sweetalert2';
-import { useNavigate } from 'react-router';
+import React, { useRef, useState } from "react";
+import Editor from "../components/Editor";
+import PostService from "../services/post.service";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router";
 
 const Create = () => {
-   
   const [postDetail, setPostDetail] = useState({
     title: "",
     summary: "",
     content: "",
-    image: null,
+    file: null,
   });
-  const [content,setcontent] = useState("");
+  
   const editorRef = useRef(null);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if(name === "file"){
-      setPostDetail({ ...postDetail,[name]:e.target.files[0]});
-    }else{
-      setPostDetail({...postDetail, [name]:value});
+    if (name === "file") {
+      setPostDetail({ ...postDetail, [name]: e.target.files[0] });
+    } else {
+      setPostDetail({ ...postDetail, [name]: value });
     }
   };
- 
- const handleContentChange = (value) => {
-  setcontent(value);
-  setPostDetail({ ...postDetail,content:content});
- }; 
+
+  const handleContentChange = (value) => {
+    setPostDetail((prev) => ({
+      ...prev,
+      content: value,
+    }));
+  };
   const handleSubmit = async () => {
     try {
       const data = new FormData();
-      data.set("title",postDetail.title);
+      data.set("title", postDetail.title);
       data.set("summary", postDetail.summary);
       data.set("content", postDetail.content);
       data.set("file", postDetail.file);
+      console.log("DATA", postDetail);
       const response = await PostService.createPost(data);
-      if(response.status === 200){
+      if (response.status === 200) {
         Swal.fire({
-          title:"Create Post",
+          title: "Create Post",
           text: "Create post successfully",
-          icon:"success",
-        }).then(()=>{
+          icon: "success",
+        }).then(() => {
           setPostDetail({
             title: "",
             summary: "",
@@ -54,19 +56,16 @@ const Create = () => {
       }
     } catch (error) {
       Swal.fire({
-        title:"Create Post",
+        title: "Create Post",
         text: error?.response?.data?.message || error.message,
-        icon:"error",
+        icon: "error",
       });
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-2xl bg-white rounded-lg shadow-lg p-6"
-      >
+    <div className=" flex items-center justify-center">
+      <div className="w-full max-w-2xl bg-white rounded-lg shadow-lg p-6">
         <h2 className="text-xl font-semibold text-center mb-6">
           Create New Post
         </h2>
@@ -99,16 +98,20 @@ const Create = () => {
         {/* Content */}
         <div className="mb-4">
           <label className="block text-sm font-medium mb-1">Content</label>
-          <Editor value={content} onChange={handleContentChange} ref={editorRef}/>
+          <Editor
+            value={postDetail.content}
+            name="content"
+            onChange={handleContentChange}
+            ref={editorRef}
+          />
         </div>
 
         {/* Upload Image */}
         <div className="mb-6">
-          <label className="block text-sm font-medium mb-1">
-            Upload Image
-          </label>
+          <label className="block text-sm font-medium mb-1">Upload Image</label>
           <input
             type="file"
+            name="file"
             onChange={handleChange}
             className="block w-full text-sm text-gray-500
               file:mr-4 file:py-2 file:px-4
@@ -127,10 +130,9 @@ const Create = () => {
         >
           Create Post
         </button>
-      </form>
+      </div>
     </div>
   );
-}
+};
 
-
-export default Create
+export default Create;
