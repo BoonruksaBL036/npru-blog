@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import Swal from "sweetalert2";
 import PostService from "../services/post.service";
 import { useContext } from "react";
@@ -9,12 +9,14 @@ import DOMPurify from "dompurify";
 const PostDetail = () => {
   const { id } = useParams();
   const { userInfo } = useContext(UserContext);
+  const navigate = useNavigate();
 
   const [post, setPost] = useState({
     _id: "",
     title: "",
     createdAt: "",
     author: {},
+    cover: "",
     content: "",
   });
   useEffect(() => {
@@ -39,6 +41,15 @@ const PostDetail = () => {
   return (
     <div className="post-page min-h-full min-w-full items-center justify-center p-4 pt-20">
       <div className="bg-white p-8 rounded-b-lg shadow-lg max-4xl w-full">
+        {post?.cover && (
+          <div className="mb-6">
+            <img 
+              src={post.cover} 
+              alt={post.title} 
+              className="w-full h-auto rounded-lg object-cover"
+            />
+          </div>
+        )}
         <h1 className="text-3xl font-bold mb-4 text-grey-800">{post?.title}</h1>
         <div className="text-grey-600 mb-4 text-center">
           <time className="block mb-2">{post?.createdAt}</time>
@@ -56,7 +67,12 @@ const PostDetail = () => {
               <a className="btn btn-warning" href={`/edit/${post?._id}`}>
                 Edit
               </a>
-              <a className="btn btn-error">Delete</a>
+              <button 
+                className="btn btn-error"
+                onClick={() => navigate(`/delete/${post?._id}`)}
+              >
+                Delete
+              </button>
             </div>
           )}
         </div>

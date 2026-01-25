@@ -5,6 +5,7 @@ import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Create from "../pages/Create";
 import Edit from "../pages/Edit";
+import Delete from "../pages/Delete";
 import PostDetail from "../pages/PostDetail";
 import PostByAuthor from "../pages/PostByAuthor";
 
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
       {
         path: "/edit/:id",
         element: <Edit />,
+      },
+      {
+        path: "/delete/:id",
+        element: <Delete />,
       },
       {
         path: "/postdetail/:id",

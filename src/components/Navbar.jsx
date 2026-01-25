@@ -12,10 +12,14 @@ const Navbar = () => {
       name: "Home",
       url: "/",
     },
-    {
+    ...(username ? [{
       name: "Create New Post",
       url: "/create",
-    },
+    }] : []),
+    ...(username ? [{
+      name: "My Posts",
+      url: `/postbyauthor/${userInfo?.id}`,
+    }] : []),
   ];
     const logout = () => {
       Swal.fire({
@@ -90,7 +94,7 @@ const Navbar = () => {
               <button onClick={() => navigate("/login")} className="btn">
                 Login
               </button>
-              <button onClick={() => navigate("/register")} className="btn">
+              <button onClick={() => navigate("/register")} className="btn ml-2">
                 Register
               </button>
             </>
